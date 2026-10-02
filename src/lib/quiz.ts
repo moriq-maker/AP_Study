@@ -2,13 +2,18 @@ import type { Field, Question } from '../data/types';
 import type { History } from './storage';
 
 export type QuizMode = 'random' | 'weak' | 'unanswered';
+export type QuizOrder = 'shuffle' | 'number';
 
 export interface QuizSettings {
+  /** 空配列ならすべての試験が対象 */
+  examIds: string[];
   fields: Field[];
   /** 空配列なら選択した大分類のすべての中分類が対象 */
   categories: string[];
   count: number;
   mode: QuizMode;
+  /** number: 試験ごとに問番号順で出題する(本番形式) */
+  order: QuizOrder;
 }
 
 export interface AnswerRecord {
@@ -35,10 +40,11 @@ export function isWeak(id: string, history: History): boolean {
 
 export function filterQuestions(
   questions: readonly Question[],
-  settings: Omit<QuizSettings, 'count'>,
+  settings: Pick<QuizSettings, 'examIds' | 'fields' | 'categories' | 'mode'>,
   history: History,
 ): Question[] {
   return questions.filter((q) => {
+    if (settings.examIds.length > 0 && !settings.examIds.includes(q.examId)) return false;
     if (!settings.fields.includes(q.field)) return false;
     if (settings.categories.length > 0 && !settings.categories.includes(q.category)) return false;
     if (settings.mode === 'weak') return isWeak(q.id, history);
@@ -53,7 +59,15 @@ export function buildQuiz(
   history: History,
   rng: () => number = Math.random,
 ): Question[] {
-  return shuffle(filterQuestions(questions, settings, history), rng).slice(0, settings.count);
+  const pool = filterQuestions(questions, settings, history);
+  if (settings.order === 'number') {
+    // 試験ごとにまとめ、試験内は問番号順に並べる(filter は元の並びを保つ)
+    const examOrder = [...new Set(pool.map((q) => q.examId))];
+    return [...pool]
+      .sort((a, b) => examOrder.indexOf(a.examId) - examOrder.indexOf(b.examId) || (a.number ?? 0) - (b.number ?? 0))
+      .slice(0, settings.count);
+  }
+  return shuffle(pool, rng).slice(0, settings.count);
 }
 
 export interface CategoryScore {

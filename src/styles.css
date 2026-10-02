@@ -340,3 +340,119 @@ progress {
     padding: 16px;
   }
 }
+
+.nav {
+  display: flex;
+  gap: 16px;
+}
+
+.chips-flat {
+  margin-left: 0;
+}
+
+.q-table {
+  margin: 12px 0;
+}
+
+.q-table figcaption {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+.table-bordered {
+  width: auto;
+  max-width: 100%;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid var(--border);
+}
+
+/* 図は白背景のスキャン画像なので、ダークモードでも白地の上に置く */
+.q-figure {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0;
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.filters select,
+.filters input {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  min-width: 0;
+}
+
+.library {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.library > li {
+  border-top: 1px solid var(--border);
+}
+
+.library-row {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  padding: 10px 0;
+  display: grid;
+  gap: 2px;
+}
+
+.library-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.library-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.library-detail {
+  padding-bottom: 16px;
+}
+
+.status {
+  border-radius: 999px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+}
+
+.status-ok {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.status-ng {
+  color: var(--ng);
+  border-color: var(--ng);
+}
+
+.choices-static .choice {
+  cursor: default;
+}

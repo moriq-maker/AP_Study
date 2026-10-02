@@ -1,13 +1,17 @@
-import type { Question } from './types';
+import type { Exam, Question } from '../types';
 
-/**
- * 収録問題。応用情報技術者試験の午前問題の形式に倣ったオリジナル問題。
- * IPA の過去問題を追加する場合は、出典(年度・期・問番号)を explanation に明記すること。
- */
+export const EXAM: Exam = {
+  id: 'original',
+  title: 'オリジナル問題',
+  order: 0,
+};
+
+/** 試験形式に倣ったオリジナル問題 */
 export const QUESTIONS: Question[] = [
   // ---------------- テクノロジ系 ----------------
   {
     id: 't-basic-001',
+    examId: 'original',
     field: 'technology',
     category: '基礎理論',
     question: '2進数 0.1101 を10進数で表したものはどれか。',
@@ -17,6 +21,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-basic-002',
+    examId: 'original',
     field: 'technology',
     category: '基礎理論',
     question: '8ビットの2の補数表現で表すことができる整数の範囲はどれか。',
@@ -27,6 +32,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-basic-003',
+    examId: 'original',
     field: 'technology',
     category: '基礎理論',
     question: '論理式 A・B + A・¬B と等価なものはどれか。ここで、・は論理積、+ は論理和、¬ は否定を表す。',
@@ -36,6 +42,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-basic-004',
+    examId: 'original',
     field: 'technology',
     category: '基礎理論',
     question:
@@ -47,6 +54,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-algo-001',
+    examId: 'original',
     field: 'technology',
     category: 'アルゴリズムとプログラミング',
     question: '昇順に整列された 1,000 個の要素からなる配列を二分探索するとき、最大の比較回数はどれか。',
@@ -57,6 +65,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-algo-002',
+    examId: 'original',
     field: 'technology',
     category: 'アルゴリズムとプログラミング',
     question:
@@ -68,6 +77,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-algo-003',
+    examId: 'original',
     field: 'technology',
     category: 'アルゴリズムとプログラミング',
     question: '要素数 n のデータを整列するとき、最悪時の計算量が O(n log n) である整列アルゴリズムはどれか。',
@@ -78,6 +88,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-comp-001',
+    examId: 'original',
     field: 'technology',
     category: 'コンピュータ構成要素',
     question:
@@ -88,6 +99,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-comp-002',
+    examId: 'original',
     field: 'technology',
     category: 'コンピュータ構成要素',
     question: 'クロック周波数 1 GHz のプロセッサで、1 命令の実行に平均 4 クロックを要するとき、このプロセッサの性能は何 MIPS か。',
@@ -97,6 +109,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-sys-001',
+    examId: 'original',
     field: 'technology',
     category: 'システム構成要素',
     question: '稼働率 0.9 の装置を 2 台並列に接続したシステムがある。いずれか 1 台が稼働していればシステムは稼働しているとみなすとき、システムの稼働率はどれか。',
@@ -106,6 +119,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-sys-002',
+    examId: 'original',
     field: 'technology',
     category: 'システム構成要素',
     question: 'MTBF が 480 時間、MTTR が 20 時間の装置の稼働率はどれか。',
@@ -115,6 +129,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-sw-001',
+    examId: 'original',
     field: 'technology',
     category: 'ソフトウェア',
     question: '仮想記憶のページ置換アルゴリズムである LRU の説明はどれか。',
@@ -130,6 +145,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-sw-002',
+    examId: 'original',
     field: 'technology',
     category: 'ソフトウェア',
     question: 'リエントラントプログラムの特徴はどれか。',
@@ -145,6 +161,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-db-001',
+    examId: 'original',
     field: 'technology',
     category: 'データベース',
     question: '関係データベースの第3正規形の説明として、適切なものはどれか。',
@@ -160,6 +177,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-db-002',
+    examId: 'original',
     field: 'technology',
     category: 'データベース',
     question: 'トランザクションの ACID 特性のうち、同時に実行される複数のトランザクションが互いに干渉しないことを保証する性質はどれか。',
@@ -170,6 +188,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-db-003',
+    examId: 'original',
     field: 'technology',
     category: 'データベース',
     question: '社員表(社員番号, 部門コード, 給与)から、平均給与が 500 以上の部門の部門コードを求める SQL 文はどれか。',
@@ -185,6 +204,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-nw-001',
+    examId: 'original',
     field: 'technology',
     category: 'ネットワーク',
     question: 'IPv4 で、サブネットマスクが /26 のネットワークに割り当てることができるホストアドレスの最大数はどれか。',
@@ -195,6 +215,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-nw-002',
+    examId: 'original',
     field: 'technology',
     category: 'ネットワーク',
     question: 'OSI 基本参照モデルのトランスポート層で動作するプロトコルはどれか。',
@@ -204,6 +225,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-nw-003',
+    examId: 'original',
     field: 'technology',
     category: 'ネットワーク',
     question: '伝送速度 100 M ビット/秒の回線で、1 M バイトのファイルを転送するのに要する時間は何秒か。ここで、回線の伝送効率は 80% とし、1 M バイト = 10⁶ バイトとする。',
@@ -213,6 +235,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-sec-001',
+    examId: 'original',
     field: 'technology',
     category: 'セキュリティ',
     question: '公開鍵暗号方式を用いたデジタル署名において、署名の生成と検証に用いる鍵の組合せとして適切なものはどれか。',
@@ -228,6 +251,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-sec-002',
+    examId: 'original',
     field: 'technology',
     category: 'セキュリティ',
     question: 'SQL インジェクション攻撃への対策として、最も有効なものはどれか。',
@@ -243,6 +267,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-sec-003',
+    examId: 'original',
     field: 'technology',
     category: 'セキュリティ',
     question: 'パスワードをハッシュ化して保存する際に、ソルトを付加する主な目的はどれか。',
@@ -258,6 +283,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-dev-001',
+    examId: 'original',
     field: 'technology',
     category: 'システム開発技術',
     question: 'ブラックボックステストのテストケース設計技法はどれか。',
@@ -268,6 +294,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-dev-002',
+    examId: 'original',
     field: 'technology',
     category: 'システム開発技術',
     question: 'モジュール強度(凝集度)が最も高いものはどれか。',
@@ -278,6 +305,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 't-dev-003',
+    examId: 'original',
     field: 'technology',
     category: 'ソフトウェア開発管理技術',
     question: 'スクラムにおいて、プロダクトバックログの項目の優先順位付けに責任をもつ役割はどれか。',
@@ -290,6 +318,7 @@ export const QUESTIONS: Question[] = [
   // ---------------- マネジメント系 ----------------
   {
     id: 'm-pm-001',
+    examId: 'original',
     field: 'management',
     category: 'プロジェクトマネジメント',
     question:
@@ -306,6 +335,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 'm-pm-002',
+    examId: 'original',
     field: 'management',
     category: 'プロジェクトマネジメント',
     question:
@@ -317,6 +347,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 'm-sm-001',
+    examId: 'original',
     field: 'management',
     category: 'サービスマネジメント',
     question: 'IT サービスマネジメントにおけるインシデント管理の目的として、適切なものはどれか。',
@@ -332,6 +363,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 'm-audit-001',
+    examId: 'original',
     field: 'management',
     category: 'システム監査',
     question: 'システム監査人が監査意見を形成する際の根拠となるものはどれか。',
@@ -344,6 +376,7 @@ export const QUESTIONS: Question[] = [
   // ---------------- ストラテジ系 ----------------
   {
     id: 's-strat-001',
+    examId: 'original',
     field: 'strategy',
     category: '経営戦略',
     question: 'PPM(プロダクトポートフォリオマネジメント)において、市場成長率が高く、相対的市場占有率も高い事業の分類はどれか。',
@@ -354,6 +387,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 's-biz-001',
+    examId: 'original',
     field: 'strategy',
     category: '企業活動',
     question: '固定費が 400 万円、変動費率が 0.6 の製品の損益分岐点売上高は何万円か。',
@@ -363,6 +397,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 's-biz-002',
+    examId: 'original',
     field: 'strategy',
     category: '企業活動',
     question: '品質管理において、不良の原因などを項目別に発生件数の多い順に並べた棒グラフと、その累積比率を示す折れ線グラフを組み合わせた図はどれか。',
@@ -373,6 +408,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 's-sys-001',
+    examId: 'original',
     field: 'strategy',
     category: 'システム戦略',
     question: 'RPA(Robotic Process Automation)の説明として、適切なものはどれか。',
@@ -388,6 +424,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 's-law-001',
+    examId: 'original',
     field: 'strategy',
     category: '法務',
     question: '著作権法によって保護されるものはどれか。',
@@ -398,6 +435,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 's-law-002',
+    examId: 'original',
     field: 'strategy',
     category: '法務',
     question: '労働者派遣において、派遣労働者に対して業務上の指揮命令を行う者はどれか。',

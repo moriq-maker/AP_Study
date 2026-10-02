@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { CHOICE_LABELS, FIELD_LABELS, type Question } from '../data/types';
+import { getExam, questionLabel } from '../data';
+import { CHOICE_LABELS, type Question } from '../data/types';
 import type { AnswerRecord } from '../lib/quiz';
+import QuestionBody from './QuestionBody';
 
 interface Props {
   questions: Question[];
@@ -15,6 +17,7 @@ export default function Quiz({ questions, onAnswer, onFinish, onQuit }: Props) {
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
 
   const q = questions[index];
+  const exam = getExam(q.examId);
   const answered = selected !== null;
   const isLast = index === questions.length - 1;
 
@@ -59,12 +62,12 @@ export default function Quiz({ questions, onAnswer, onFinish, onQuit }: Props) {
           問{index + 1} / {questions.length}
         </span>
         <span className="tag">
-          {FIELD_LABELS[q.field]} › {q.category}
+          {questionLabel(q)} › {q.category}
         </span>
       </div>
       <progress value={index + (answered ? 1 : 0)} max={questions.length} />
 
-      <p className="question">{q.question}</p>
+      <QuestionBody question={q} />
 
       <ol className="choices">
         {q.choices.map((c, i) => (
@@ -83,6 +86,7 @@ export default function Quiz({ questions, onAnswer, onFinish, onQuit }: Props) {
             {selected === q.answer ? '正解！' : `不正解 — 正解は「${CHOICE_LABELS[q.answer]}」`}
           </p>
           <p>{q.explanation}</p>
+          {exam?.authoredExplanation && <p className="hint">解説は本アプリ独自のものです。</p>}
         </div>
       )}
 
@@ -97,6 +101,7 @@ export default function Quiz({ questions, onAnswer, onFinish, onQuit }: Props) {
         )}
       </div>
       <p className="hint">キーボード: 1〜4 で解答 / Enter で次へ</p>
+      {exam?.credit && <p className="hint">{exam.credit}</p>}
     </div>
   );
 }

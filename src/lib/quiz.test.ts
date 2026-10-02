@@ -3,8 +3,10 @@ import type { Question } from '../data/types';
 import { buildQuiz, filterQuestions, percent, scoreByCategory, shuffle } from './quiz';
 import { recordAnswer, type History } from './storage';
 
-const q = (id: string, field: Question['field'], category: string): Question => ({
+const q = (id: string, field: Question['field'], category: string, examId = 'e1', number?: number): Question => ({
   id,
+  examId,
+  number,
   field,
   category,
   question: id,
@@ -14,11 +16,13 @@ const q = (id: string, field: Question['field'], category: string): Question => 
 });
 
 const pool = [
-  q('t1', 'technology', 'ネットワーク'),
-  q('t2', 'technology', 'データベース'),
-  q('m1', 'management', 'プロジェクトマネジメント'),
-  q('s1', 'strategy', '法務'),
+  q('t1', 'technology', 'ネットワーク', 'e1', 3),
+  q('t2', 'technology', 'データベース', 'e1', 1),
+  q('m1', 'management', 'プロジェクトマネジメント', 'e2', 2),
+  q('s1', 'strategy', '法務', 'e2', 1),
 ];
+
+const ALL = { examIds: [], fields: ['technology', 'management', 'strategy'] as Question['field'][], categories: [] };
 
 describe('shuffle', () => {
   it('keeps all elements and does not mutate the input', () => {
@@ -31,7 +35,7 @@ describe('shuffle', () => {
 
 describe('filterQuestions', () => {
   it('filters by field and category', () => {
-    const base = { fields: ['technology' as const], categories: [], mode: 'random' as const };
+    const base = { examIds: [], fields: ['technology' as const], categories: [], mode: 'random' as const };
     expect(filterQuestions(pool, base, {}).map((x) => x.id)).toEqual(['t1', 't2']);
     expect(filterQuestions(pool, { ...base, categories: ['データベース'] }, {}).map((x) => x.id)).toEqual(['t2']);
   });
@@ -41,21 +45,31 @@ describe('filterQuestions', () => {
     h = recordAnswer(h, 't1', false);
     h = recordAnswer(h, 't2', false);
     h = recordAnswer(h, 't2', true);
-    const settings = { fields: ['technology' as const], categories: [], mode: 'weak' as const };
+    const settings = { examIds: [], fields: ['technology' as const], categories: [], mode: 'weak' as const };
     expect(filterQuestions(pool, settings, h).map((x) => x.id)).toEqual(['t1']);
   });
 
   it('unanswered mode excludes answered questions', () => {
     const h = recordAnswer({}, 'm1', true);
-    const settings = { fields: ['management' as const, 'strategy' as const], categories: [], mode: 'unanswered' as const };
+    const settings = { examIds: [], fields: ['management' as const, 'strategy' as const], categories: [], mode: 'unanswered' as const };
     expect(filterQuestions(pool, settings, h).map((x) => x.id)).toEqual(['s1']);
   });
 });
 
 describe('buildQuiz', () => {
   it('limits to the requested count', () => {
-    const quiz = buildQuiz(pool, { fields: ['technology', 'management', 'strategy'], categories: [], count: 2, mode: 'random' }, {});
+    const quiz = buildQuiz(pool, { ...ALL, count: 2, mode: 'random', order: 'shuffle' }, {});
     expect(quiz).toHaveLength(2);
+  });
+
+  it('filters by exam and orders by question number', () => {
+    const quiz = buildQuiz(pool, { ...ALL, examIds: ['e1'], count: 10, mode: 'random', order: 'number' }, {});
+    expect(quiz.map((x) => x.id)).toEqual(['t2', 't1']);
+  });
+
+  it('keeps exams grouped in number order', () => {
+    const quiz = buildQuiz(pool, { ...ALL, count: 10, mode: 'random', order: 'number' }, {});
+    expect(quiz.map((x) => x.id)).toEqual(['t2', 't1', 's1', 'm1']);
   });
 });
 

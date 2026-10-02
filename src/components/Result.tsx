@@ -1,3 +1,4 @@
+import { questionLabel } from '../data';
 import { CHOICE_LABELS, type Question } from '../data/types';
 import { percent, scoreByCategory, type AnswerRecord } from '../lib/quiz';
 
@@ -58,6 +59,7 @@ export default function Result({ questions, answers, onRetryWrong, onHome }: Pro
           <ul className="review">
             {wrong.map(({ a, q }) => (
               <li key={q.id}>
+                <p className="tag">{questionLabel(q)}</p>
                 <p className="question">{q.question}</p>
                 <p>
                   あなたの解答: {CHOICE_LABELS[a.selected]} {q.choices[a.selected]}

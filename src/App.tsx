@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { QUESTIONS } from './data/questions';
+import { EXAMS, QUESTIONS } from './data';
 import type { Question } from './data/types';
 import { buildQuiz, type AnswerRecord, type QuizSettings } from './lib/quiz';
 import { clearHistory, loadHistory, recordAnswer, saveHistory, type History } from './lib/storage';
 import Home from './components/Home';
+import Library from './components/Library';
 import Quiz from './components/Quiz';
 import Result from './components/Result';
 import Stats from './components/Stats';
@@ -12,7 +13,8 @@ type Screen =
   | { name: 'home' }
   | { name: 'quiz'; questions: Question[] }
   | { name: 'result'; questions: Question[]; answers: AnswerRecord[] }
-  | { name: 'stats' };
+  | { name: 'stats' }
+  | { name: 'library' };
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'home' });
@@ -43,14 +45,17 @@ export default function App() {
           AP Study
           <span className="brand-sub">応用情報技術者試験 午前問題演習</span>
         </button>
-        <nav>
+        <nav className="nav">
+          <button className="link" onClick={() => setScreen({ name: 'library' })}>
+            問題一覧
+          </button>
           <button className="link" onClick={() => setScreen({ name: 'stats' })}>
             学習記録
           </button>
         </nav>
       </header>
       <main>
-        {screen.name === 'home' && <Home questions={QUESTIONS} history={history} onStart={start} />}
+        {screen.name === 'home' && <Home exams={EXAMS} questions={QUESTIONS} history={history} onStart={start} />}
         {screen.name === 'quiz' && (
           <Quiz
             questions={screen.questions}
@@ -66,6 +71,9 @@ export default function App() {
             onRetryWrong={(qs) => setScreen({ name: 'quiz', questions: qs })}
             onHome={() => setScreen({ name: 'home' })}
           />
+        )}
+        {screen.name === 'library' && (
+          <Library exams={EXAMS} questions={QUESTIONS} history={history} onHome={() => setScreen({ name: 'home' })} />
         )}
         {screen.name === 'stats' && (
           <Stats questions={QUESTIONS} history={history} onReset={reset} onHome={() => setScreen({ name: 'home' })} />
