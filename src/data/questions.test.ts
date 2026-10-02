@@ -1,5 +1,6 @@
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { EXAMS, QUESTIONS } from '.';
+import { EXAMS, PM_EXAMS, QUESTIONS, WRITTEN_QUESTIONS } from '.';
 import { CHOICE_LABELS } from './types';
 import * as r07AutumnAm from './exams/r07-autumn-am';
 
@@ -36,5 +37,32 @@ describe('exam data', () => {
   it('r07-autumn-am answers match the official answer key', () => {
     const key = 'エイイウイイアエイアイウアイエイウイエアアウエウウイエアイウアアイエエイウアエアアアウイアエイイエエアエウアアアイエウイアエイウイウウイアイイイウエウエイエアア';
     expect(r07AutumnAm.QUESTIONS.map((q) => CHOICE_LABELS[q.answer]).join('')).toBe(key);
+  });
+});
+
+describe('afternoon exam data', () => {
+  it('has unique ids, registered exams and non-empty items', () => {
+    const ids = WRITTEN_QUESTIONS.map((q) => q.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const examIds = new Set(PM_EXAMS.map((e) => e.id));
+    for (const q of WRITTEN_QUESTIONS) {
+      expect(examIds).toContain(q.examId);
+      expect(q.pages.length).toBeGreaterThan(0);
+      expect(q.items.length).toBeGreaterThan(0);
+      for (const item of q.items) expect(item.answer.trim()).not.toBe('');
+    }
+  });
+
+  it('every image exists in public/', () => {
+    for (const q of QUESTIONS) {
+      for (const f of [...(q.figures ?? []), ...(q.choiceFigure ? [q.choiceFigure] : [])]) {
+        expect(existsSync(`public/${f}`), f).toBe(true);
+      }
+    }
+    for (const q of WRITTEN_QUESTIONS) {
+      for (const page of [...q.pages, ...(q.referencePages ?? [])]) {
+        expect(existsSync(`public/${page}`), page).toBe(true);
+      }
+    }
   });
 });

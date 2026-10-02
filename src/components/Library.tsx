@@ -50,7 +50,7 @@ export default function Library({ exams, questions, history, onHome }: Props) {
 
   return (
     <div className="card">
-      <h1>問題一覧</h1>
+      <h1>午前問題一覧</h1>
       <div className="filters">
         <select
           value={examId}

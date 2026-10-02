@@ -63,6 +63,8 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
   padding: 16px 0;
 }
 
@@ -346,6 +348,10 @@ progress {
   gap: 16px;
 }
 
+.nav .link {
+  white-space: nowrap;
+}
+
 .chips-flat {
   margin-left: 0;
 }
@@ -455,4 +461,113 @@ progress {
 
 .choices-static .choice {
   cursor: default;
+}
+
+.written-title {
+  font-size: 1.15rem;
+  margin: 8px 0 4px;
+}
+
+.pages {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+/* 問題冊子のページ画像。白地のスキャンなのでダークモードでも白地で表示する */
+.q-page {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.reference summary {
+  cursor: pointer;
+  color: var(--primary);
+}
+
+.answer-sheet {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.answer-sheet li {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.answer-sheet li.sheet-ok {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+}
+
+.answer-sheet li.sheet-ng {
+  border-color: var(--ng);
+  background: var(--ng-bg);
+}
+
+.sheet-label {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.answer-sheet input,
+.answer-sheet textarea {
+  font: inherit;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.sheet-answer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.mark-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.mark {
+  min-width: 40px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.mark-on-ok {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+
+.mark-on-ng {
+  background: var(--ng);
+  border-color: var(--ng);
+  color: #fff;
+}
+
+.feedback h3 {
+  font-size: 0.95rem;
+  margin: 12px 0 4px;
 }

@@ -52,3 +52,39 @@ export interface Question {
 }
 
 export const CHOICE_LABELS = ['ア', 'イ', 'ウ', 'エ'] as const;
+
+/**
+ * 午後(記述式)の解答欄一つ分。
+ * - exact: 解答例と表記ゆれを除いて一致すれば自動で正解にする(記号・数値・用語)
+ * - free: 文章で答える設問。解答例を見て自己採点する
+ */
+export interface WrittenItem {
+  /** 例: '設問1 a' */
+  label: string;
+  /** 解答例(公式) */
+  answer: string;
+  kind: 'exact' | 'free';
+  /** 解答例に併記されている別解 */
+  accept?: string[];
+  /** 「順不同」の解答欄に同じ値を付ける。グループ内では解答例をどの順で書いても正解 */
+  unordered?: string;
+}
+
+export interface WrittenQuestion {
+  /** 一意なID。学習記録のキーになるため変更しないこと */
+  id: string;
+  examId: string;
+  number: number;
+  /** 出題分野(例: 情報セキュリティ) */
+  category: string;
+  theme: string;
+  /** 必須問題か */
+  required?: boolean;
+  /** 問題冊子のページ画像(public/ からの相対パス) */
+  pages: string[];
+  /** 問題を読むのに必要な共通ページ(擬似言語の記述形式など) */
+  referencePages?: string[];
+  /** 出題趣旨(公式) */
+  aim: string;
+  items: WrittenItem[];
+}
