@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Question } from '../data/types';
 import { buildQuiz, filterQuestions, percent, scoreByCategory, shuffle } from './quiz';
-import { recordAnswer, type History } from './storage';
+import type { History } from './quiz';
 
 const q = (id: string, field: Question['field'], category: string, examId = 'e1', number?: number): Question => ({
   id,
@@ -41,16 +41,14 @@ describe('filterQuestions', () => {
   });
 
   it('weak mode returns only questions whose last answer was wrong', () => {
-    let h: History = {};
-    h = recordAnswer(h, 't1', false);
-    h = recordAnswer(h, 't2', false);
-    h = recordAnswer(h, 't2', true);
+    // t2 は一度間違えた後に正解している
+    const h: History = { t1: { lastCorrect: false }, t2: { lastCorrect: true } };
     const settings = { examIds: [], fields: ['technology' as const], categories: [], mode: 'weak' as const };
     expect(filterQuestions(pool, settings, h).map((x) => x.id)).toEqual(['t1']);
   });
 
   it('unanswered mode excludes answered questions', () => {
-    const h = recordAnswer({}, 'm1', true);
+    const h: History = { m1: { lastCorrect: true } };
     const settings = { examIds: [], fields: ['management' as const, 'strategy' as const], categories: [], mode: 'unanswered' as const };
     expect(filterQuestions(pool, settings, h).map((x) => x.id)).toEqual(['s1']);
   });
@@ -70,15 +68,6 @@ describe('buildQuiz', () => {
   it('keeps exams grouped in number order', () => {
     const quiz = buildQuiz(pool, { ...ALL, count: 10, mode: 'random', order: 'number' }, {});
     expect(quiz.map((x) => x.id)).toEqual(['t2', 't1', 's1', 'm1']);
-  });
-});
-
-describe('recordAnswer', () => {
-  it('accumulates attempts and correct counts', () => {
-    let h: History = {};
-    h = recordAnswer(h, 'x', true);
-    h = recordAnswer(h, 'x', false);
-    expect(h.x).toMatchObject({ attempts: 2, correct: 1, lastCorrect: false });
   });
 });
 

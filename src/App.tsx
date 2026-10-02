@@ -1,134 +1,77 @@
-import { useEffect, useState } from 'react';
-import { EXAMS, PM_EXAMS, QUESTIONS, WRITTEN_QUESTIONS } from './data';
-import type { Question, WrittenQuestion } from './data/types';
-import { buildQuiz, type AnswerRecord, type QuizSettings } from './lib/quiz';
-import { clearHistory, loadHistory, recordAnswer, saveHistory, type History } from './lib/storage';
-import {
-  clearWrittenHistory,
-  loadWrittenHistory,
-  recordWritten,
-  saveWrittenHistory,
-  type WrittenHistory,
-} from './lib/written';
-import Home from './components/Home';
-import Library from './components/Library';
-import Quiz from './components/Quiz';
-import Result from './components/Result';
-import Stats from './components/Stats';
-import WrittenList from './components/WrittenList';
-import WrittenQuiz from './components/WrittenQuiz';
+import { useEffect } from 'react';
+import { HashRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router';
+import { BookmarksPage, CategoryPage, ExamPage, ExamsPage, FieldsPage } from './pages/ArchivePages';
+import AmQuestionPage from './pages/AmQuestionPage';
+import HomePage from './pages/HomePage';
+import NotFound from './pages/NotFound';
+import PmQuestionPage from './pages/PmQuestionPage';
+import PracticePage from './pages/PracticePage';
+import SearchPage from './pages/SearchPage';
+import StatsPage from './pages/StatsPage';
+import { UserDataProvider } from './store/UserDataContext';
 
-type Screen =
-  | { name: 'home' }
-  | { name: 'quiz'; questions: Question[] }
-  | { name: 'result'; questions: Question[]; answers: AnswerRecord[] }
-  | { name: 'stats' }
-  | { name: 'library' }
-  | { name: 'written-list' }
-  | { name: 'written'; question: WrittenQuestion };
+const NAV_ITEMS = [
+  { to: '/exams', label: '過去問倉庫' },
+  { to: '/fields', label: '分野別' },
+  { to: '/practice', label: '演習' },
+  { to: '/search', label: '検索' },
+  { to: '/bookmarks', label: 'ブックマーク' },
+  { to: '/stats', label: '記録' },
+];
 
-export default function App() {
-  const [screen, setScreen] = useState<Screen>({ name: 'home' });
-  const [history, setHistory] = useState<History>(() => loadHistory());
-  const [writtenHistory, setWrittenHistory] = useState<WrittenHistory>(() => loadWrittenHistory());
-
-  useEffect(() => {
-    saveHistory(history);
-  }, [history]);
-
-  useEffect(() => {
-    saveWrittenHistory(writtenHistory);
-  }, [writtenHistory]);
-
-  // 画面を切り替えたら先頭から表示する
+/** 画面を移動したら先頭から表示する */
+function ScrollToTop() {
+  const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [screen]);
+  }, [pathname]);
+  return null;
+}
 
-  const start = (settings: QuizSettings) => {
-    const questions = buildQuiz(QUESTIONS, settings, history);
-    if (questions.length > 0) setScreen({ name: 'quiz', questions });
-  };
-
-  const handleAnswer = (record: AnswerRecord) => {
-    setHistory((h) => recordAnswer(h, record.questionId, record.correct));
-  };
-
-  const reset = () => {
-    clearHistory();
-    clearWrittenHistory();
-    setHistory({});
-    setWrittenHistory({});
-  };
-
+function Layout() {
   return (
     <div className="app">
+      <ScrollToTop />
       <header className="app-header">
-        <button className="brand" onClick={() => setScreen({ name: 'home' })}>
+        <Link to="/" className="brand">
           AP Study
-          <span className="brand-sub">応用情報技術者試験 問題演習</span>
-        </button>
-        <nav className="nav">
-          <button className="link" onClick={() => setScreen({ name: 'library' })}>
-            午前一覧
-          </button>
-          <button className="link" onClick={() => setScreen({ name: 'written-list' })}>
-            午後問題
-          </button>
-          <button className="link" onClick={() => setScreen({ name: 'stats' })}>
-            学習記録
-          </button>
+          <span className="brand-sub">応用情報技術者試験 過去問演習</span>
+        </Link>
+        <nav className="nav" aria-label="メインメニュー">
+          {NAV_ITEMS.map((item) => (
+            <NavLink key={item.to} to={item.to} className={({ isActive }) => `nav-link ${isActive ? 'nav-active' : ''}`}>
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
       </header>
       <main>
-        {screen.name === 'home' && <Home exams={EXAMS} questions={QUESTIONS} history={history} onStart={start} />}
-        {screen.name === 'quiz' && (
-          <Quiz
-            questions={screen.questions}
-            onAnswer={handleAnswer}
-            onFinish={(answers) => setScreen({ name: 'result', questions: screen.questions, answers })}
-            onQuit={() => setScreen({ name: 'home' })}
-          />
-        )}
-        {screen.name === 'result' && (
-          <Result
-            questions={screen.questions}
-            answers={screen.answers}
-            onRetryWrong={(qs) => setScreen({ name: 'quiz', questions: qs })}
-            onHome={() => setScreen({ name: 'home' })}
-          />
-        )}
-        {screen.name === 'library' && (
-          <Library exams={EXAMS} questions={QUESTIONS} history={history} onHome={() => setScreen({ name: 'home' })} />
-        )}
-        {screen.name === 'written-list' && (
-          <WrittenList
-            exams={PM_EXAMS}
-            questions={WRITTEN_QUESTIONS}
-            history={writtenHistory}
-            onOpen={(question) => setScreen({ name: 'written', question })}
-          />
-        )}
-        {screen.name === 'written' && (
-          <WrittenQuiz
-            key={screen.question.id}
-            question={screen.question}
-            previous={writtenHistory[screen.question.id]}
-            onSubmit={(inputs, marks) => setWrittenHistory((h) => recordWritten(h, screen.question.id, inputs, marks))}
-            onBack={() => setScreen({ name: 'written-list' })}
-          />
-        )}
-        {screen.name === 'stats' && (
-          <Stats
-            questions={QUESTIONS}
-            history={history}
-            writtenQuestions={WRITTEN_QUESTIONS}
-            writtenHistory={writtenHistory}
-            onReset={reset}
-            onHome={() => setScreen({ name: 'home' })}
-          />
-        )}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/exams" element={<ExamsPage />} />
+          <Route path="/exams/:examId" element={<ExamPage />} />
+          <Route path="/q/:id" element={<AmQuestionPage />} />
+          <Route path="/pm/:id" element={<PmQuestionPage />} />
+          <Route path="/fields" element={<FieldsPage />} />
+          <Route path="/fields/:category" element={<CategoryPage />} />
+          <Route path="/practice" element={<PracticePage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/bookmarks" element={<BookmarksPage />} />
+          <Route path="/stats" element={<StatsPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </main>
     </div>
+  );
+}
+
+// 静的ホスティング(GitHub Pages など)でもページ単位の URL が動くようにハッシュ方式のルーティングを使う
+export default function App() {
+  return (
+    <HashRouter>
+      <UserDataProvider>
+        <Layout />
+      </UserDataProvider>
+    </HashRouter>
   );
 }

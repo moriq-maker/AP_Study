@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { questionLabel } from '../data';
 import { CHOICE_LABELS, type Question } from '../data/types';
 import { percent, scoreByCategory, type AnswerRecord } from '../lib/quiz';
@@ -59,7 +60,9 @@ export default function Result({ questions, answers, onRetryWrong, onHome }: Pro
           <ul className="review">
             {wrong.map(({ a, q }) => (
               <li key={q.id}>
-                <p className="tag">{questionLabel(q)}</p>
+                <p className="tag">
+                  <Link to={`/q/${q.id}`}>{questionLabel(q)}</Link>
+                </p>
                 <p className="question">{q.question}</p>
                 <p>
                   あなたの解答: {CHOICE_LABELS[a.selected]} {q.choices[a.selected]}
@@ -75,7 +78,7 @@ export default function Result({ questions, answers, onRetryWrong, onHome }: Pro
 
       <div className="actions">
         <button className="link" onClick={onHome}>
-          トップへ戻る
+          演習の設定に戻る
         </button>
         {wrong.length > 0 && (
           <button className="primary" onClick={() => onRetryWrong(wrong.map((w) => w.q))}>

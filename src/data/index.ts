@@ -34,3 +34,42 @@ export function questionLabel(q: Pick<Question, 'examId' | 'number'>): string {
   const title = getExam(q.examId)?.title ?? q.examId;
   return q.number === undefined ? title : `${title} 問${q.number}`;
 }
+
+const questionById = new Map(QUESTIONS.map((q) => [q.id, q]));
+const writtenById = new Map(WRITTEN_QUESTIONS.map((q) => [q.id, q]));
+
+export function getQuestion(id: string): Question | undefined {
+  return questionById.get(id);
+}
+
+export function getWrittenQuestion(id: string): WrittenQuestion | undefined {
+  return writtenById.get(id);
+}
+
+export function isPmExam(examId: string): boolean {
+  return PM_EXAMS.some((e) => e.id === examId);
+}
+
+export function questionsOfExam(examId: string): Question[] {
+  return QUESTIONS.filter((q) => q.examId === examId);
+}
+
+export function writtenQuestionsOfExam(examId: string): WrittenQuestion[] {
+  return WRITTEN_QUESTIONS.filter((q) => q.examId === examId);
+}
+
+const examOrder = (examId: string) => getExam(examId)?.order ?? 0;
+
+/** 午前の中分類ごとの問題(新しい試験から順) */
+export function questionsOfCategory(category: string): Question[] {
+  return QUESTIONS.filter((q) => q.category === category).sort(
+    (a, b) => examOrder(b.examId) - examOrder(a.examId) || (a.number ?? 0) - (b.number ?? 0),
+  );
+}
+
+/** 午後の出題分野ごとの問題(新しい試験から順) */
+export function writtenQuestionsOfCategory(category: string): WrittenQuestion[] {
+  return WRITTEN_QUESTIONS.filter((q) => q.category === category).sort(
+    (a, b) => examOrder(b.examId) - examOrder(a.examId) || a.number - b.number,
+  );
+}

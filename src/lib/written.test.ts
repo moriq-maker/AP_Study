@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { WrittenItem } from '../data/types';
-import { autoGrade, normalize, recordWritten } from './written';
+import { autoGrade, normalize } from './written';
 
 const exact = (answer: string, extra: Partial<WrittenItem> = {}): WrittenItem => ({ label: '', answer, kind: 'exact', ...extra });
 
@@ -28,9 +28,3 @@ describe('autoGrade', () => {
   });
 });
 
-describe('recordWritten', () => {
-  it('stores the latest score and inputs', () => {
-    const h = recordWritten(recordWritten({}, 'x', ['a'], [false]), 'x', ['b'], [true]);
-    expect(h.x).toMatchObject({ attempts: 2, lastCorrect: 1, total: 1, lastInputs: ['b'] });
-  });
-});

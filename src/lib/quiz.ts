@@ -1,5 +1,6 @@
 import type { Field, Question } from '../data/types';
-import type { History } from './storage';
+/** 問題 ID → 直近の正誤。学習データ(UserData.am)をそのまま渡せる */
+export type History = Record<string, { lastCorrect: boolean }>;
 
 export type QuizMode = 'random' | 'weak' | 'unanswered';
 export type QuizOrder = 'shuffle' | 'number';

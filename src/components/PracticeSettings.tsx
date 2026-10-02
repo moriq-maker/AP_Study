@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { FIELD_LABELS, type Exam, type Field, type Question } from '../data/types';
-import { filterQuestions, type QuizMode, type QuizOrder, type QuizSettings } from '../lib/quiz';
-import type { History } from '../lib/storage';
+import { filterQuestions, type History, type QuizMode, type QuizOrder, type QuizSettings } from '../lib/quiz';
 
 interface Props {
   exams: readonly Exam[];
   questions: readonly Question[];
   history: History;
+  /** URL などから渡す初期設定 */
+  initial?: Partial<QuizSettings>;
   onStart: (settings: QuizSettings) => void;
 }
 
@@ -22,13 +23,13 @@ const ORDER_LABELS: Record<QuizOrder, string> = {
   number: '問番号順(本番形式)',
 };
 
-export default function Home({ exams, questions, history, onStart }: Props) {
-  const [examIds, setExamIds] = useState<string[]>([]);
-  const [fields, setFields] = useState<Field[]>(ALL_FIELDS);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [count, setCount] = useState(10);
-  const [mode, setMode] = useState<QuizMode>('random');
-  const [order, setOrder] = useState<QuizOrder>('shuffle');
+export default function PracticeSettings({ exams, questions, history, initial = {}, onStart }: Props) {
+  const [examIds, setExamIds] = useState<string[]>(initial.examIds ?? []);
+  const [fields, setFields] = useState<Field[]>(initial.fields ?? ALL_FIELDS);
+  const [categories, setCategories] = useState<string[]>(initial.categories ?? []);
+  const [count, setCount] = useState(initial.count ?? 10);
+  const [mode, setMode] = useState<QuizMode>(initial.mode ?? 'random');
+  const [order, setOrder] = useState<QuizOrder>(initial.order ?? 'shuffle');
 
   const countByExam = useMemo(() => {
     const map = new Map<string, number>();
@@ -68,7 +69,8 @@ export default function Home({ exams, questions, history, onStart }: Props) {
 
   return (
     <div className="card">
-      <h1>出題設定</h1>
+      <h1>演習</h1>
+      <p className="hint">条件を選んで午前問題を連続で解きます。</p>
 
       <section>
         <h2>試験</h2>
