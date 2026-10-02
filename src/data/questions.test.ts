@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { EXAMS, PM_EXAMS, QUESTIONS, WRITTEN_QUESTIONS } from '.';
 import { CHOICE_LABELS } from './types';
+import * as r06AutumnAm from './exams/r06-autumn-am';
 import * as r07AutumnAm from './exams/r07-autumn-am';
 
 describe('question data', () => {
@@ -33,10 +34,12 @@ describe('exam data', () => {
     }
   });
 
-  // 公式解答例 (令和7年度秋期 午前) の正解を問1から順に並べたもの
-  it('r07-autumn-am answers match the official answer key', () => {
-    const key = 'エイイウイイアエイアイウアイエイウイエアアウエウウイエアイウアアイエエイウアエアアアウイアエイイエエアエウアアアイエウイアエイウイウウイアイイイウエウエイエアア';
-    expect(r07AutumnAm.QUESTIONS.map((q) => CHOICE_LABELS[q.answer]).join('')).toBe(key);
+  // 公式解答例の正解を問1から順に並べたもの
+  it.each([
+    [r07AutumnAm, 'エイイウイイアエイアイウアイエイウイエアアウエウウイエアイウアアイエエイウアエアアアウイアエイイエエアエウアアアイエウイアエイウイウウイアイイイウエウエイエアア'],
+    [r06AutumnAm, 'ウエウアウイウウウイウエエイアウアエウウウウウウイエイウイイイウウウエアウウアウウイエイイアウイイエウエアエエウイアアウイエイイウアエウウウウアイウイイアイアウ'],
+  ])('$EXAM.id answers match the official answer key', (mod, key) => {
+    expect(mod.QUESTIONS.map((q) => CHOICE_LABELS[q.answer]).join('')).toBe(key);
   });
 });
 

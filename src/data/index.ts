@@ -1,17 +1,19 @@
 import type { Exam, Question, WrittenQuestion } from './types';
 import * as original from './exams/original';
+import * as r06AutumnAm from './exams/r06-autumn-am';
+import * as r06AutumnPm from './exams/r06-autumn-pm';
 import * as r07AutumnAm from './exams/r07-autumn-am';
 import * as r07AutumnPm from './exams/r07-autumn-pm';
 
 /** 収録している午前試験。新しい試験を追加したらここに登録する */
-const MODULES: { EXAM: Exam; QUESTIONS: Question[] }[] = [r07AutumnAm, original];
+const MODULES: { EXAM: Exam; QUESTIONS: Question[] }[] = [r07AutumnAm, r06AutumnAm, original];
 
 export const EXAMS: Exam[] = MODULES.map((m) => m.EXAM).sort((a, b) => b.order - a.order);
 
 export const QUESTIONS: Question[] = MODULES.flatMap((m) => m.QUESTIONS);
 
 /** 収録している午後試験。新しい試験を追加したらここに登録する */
-const PM_MODULES: { EXAM: Exam; QUESTIONS: WrittenQuestion[] }[] = [r07AutumnPm];
+const PM_MODULES: { EXAM: Exam; QUESTIONS: WrittenQuestion[] }[] = [r07AutumnPm, r06AutumnPm];
 
 export const PM_EXAMS: Exam[] = PM_MODULES.map((m) => m.EXAM).sort((a, b) => b.order - a.order);
 

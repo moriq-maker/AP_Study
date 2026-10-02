@@ -9,6 +9,8 @@ describe('normalize', () => {
     expect(normalize('lcsl[n − 1, k − 1] ＋ 1')).toBe(normalize('lcsl[n-1,k-1]+1'));
     expect(normalize('Ｗｅｂ サーバ')).toBe(normalize('webサーバ'));
     expect(normalize('6,510')).toBe(normalize('６，５１０'));
+    expect(normalize('isPrime[(d－1)÷2]が true と等しい')).toBe(normalize('isPrime[(d-1)÷2]がtrueと等しい'));
+    expect(normalize('N2')).toBe(normalize('N²'));
   });
 });
 

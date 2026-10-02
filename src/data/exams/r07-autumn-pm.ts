@@ -1,4 +1,5 @@
-import type { Exam, WrittenItem, WrittenQuestion } from '../types';
+import type { Exam, WrittenQuestion } from '../types';
+import { exact, free, pageRange, writtenQuestionFactory } from './written-helpers';
 
 export const EXAM: Exam = {
   id: 'r07-autumn-pm',
@@ -7,42 +8,7 @@ export const EXAM: Exam = {
   credit: '出典: 令和7年度 秋期 応用情報技術者試験 午後 (©2025 独立行政法人情報処理推進機構)',
 };
 
-const FIG = `figures/${EXAM.id}`;
-
-/** 問題冊子のページ番号の範囲から画像パスの配列を作る */
-function pages(from: number, to: number): string[] {
-  return Array.from({ length: to - from + 1 }, (_, i) => `${FIG}/p${String(from + i).padStart(2, '0')}.webp`);
-}
-
-/** 記号・数値・用語など、表記ゆれを除いて一致すれば正解とする解答欄 */
-const exact = (label: string, answer: string, extra: Partial<WrittenItem> = {}): WrittenItem => ({
-  label,
-  answer,
-  kind: 'exact',
-  ...extra,
-});
-
-/** 文章で答える解答欄(自己採点) */
-const free = (label: string, answer: string, extra: Partial<WrittenItem> = {}): WrittenItem => ({
-  label,
-  answer,
-  kind: 'free',
-  ...extra,
-});
-
-function q(number: number, category: string, theme: string, range: [number, number], aim: string, items: WrittenItem[], extra: Partial<WrittenQuestion> = {}): WrittenQuestion {
-  return {
-    id: `${EXAM.id}-${String(number).padStart(2, '0')}`,
-    examId: EXAM.id,
-    number,
-    category,
-    theme,
-    pages: pages(...range),
-    aim,
-    items,
-    ...extra,
-  };
-}
+const q = writtenQuestionFactory(EXAM.id);
 
 // 解答例・出題趣旨は IPA 公表の「令和7年度 秋期 応用情報技術者試験 解答例 午後試験」による
 export const QUESTIONS: WrittenQuestion[] = [
@@ -88,7 +54,7 @@ export const QUESTIONS: WrittenQuestion[] = [
       exact('設問3 カ', 'lcsl[s, t]'),
       exact('設問4 キ', 'st'),
     ],
-    { referencePages: pages(4, 5) },
+    { referencePages: pageRange(EXAM.id, 4, 5) },
   ),
   q(
     4, 'システムアーキテクチャ', 'エッジコンピューティング', [24, 28],
