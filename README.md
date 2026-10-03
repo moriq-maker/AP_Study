@@ -25,8 +25,9 @@
 接続先は `src/lib/supabase.ts` に書いてある(別のプロジェクトを使うときは `.env.local` に `VITE_SUPABASE_URL` / `VITE_SUPABASE_KEY` を設定)。プロジェクト側では次を一度だけ行う。
 
 1. **SQL Editor** で `supabase/schema.sql` を実行する(テーブル作成と行レベルセキュリティ)
-2. **Authentication → Email Templates** の「Magic Link」と「Confirm signup」の本文に、ログインコード `{{ .Token }}` を入れる
-3. **Authentication → URL Configuration** の Site URL / Redirect URLs に公開先の URL を登録する(メール内のリンクでログインする場合に必要)
+2. **Authentication → Emails → SMTP Settings** で独自の SMTP(例: Gmail のアプリパスワード)を設定する(標準のメールは本文を編集できないため)
+3. **Authentication → Emails** の「Magic link or OTP」と「Confirm sign up」の本文に、ログインコード `{{ .Token }}` を入れる
+4. **Authentication → URL Configuration** の Site URL / Redirect URLs に公開先の URL(https://moriq-maker.github.io/AP_Study/)を登録する
 
 ## 収録問題
 
@@ -52,6 +53,10 @@ npm run build    # 型チェック + 本番ビルド (dist/)
 ```
 
 `dist/` は相対パスで出力されるため、GitHub Pages などの静的ホスティングにそのまま配置できます。
+
+### 公開(GitHub Pages)
+
+デフォルトブランチに push すると、GitHub Actions(`.github/workflows/deploy.yml`)がテストとビルドを行い、https://moriq-maker.github.io/AP_Study/ に公開します。初回だけ、リポジトリの Settings → Pages → Source を「GitHub Actions」にしておく必要があります。
 
 ## 試験の追加
 
