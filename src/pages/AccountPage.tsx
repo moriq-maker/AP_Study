@@ -122,7 +122,7 @@ export default function AccountPage() {
             }}
           >
             <p>
-              <strong>{email}</strong> にメールを送りました。メールに書かれた数字のコード(6〜8 桁)を入力するか、メール内のリンクを開いてください。
+              <strong>{email}</strong> にメールを送りました。メールに書かれた数字のコード(6〜8 桁)を入力してください。
             </p>
             <label htmlFor="code">ログインコード</label>
             <input
