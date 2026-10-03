@@ -2,8 +2,8 @@ import type { Exam, WrittenQuestion } from '../types';
 import { exact, free, pageRange, writtenQuestionFactory } from './written-helpers';
 
 export const EXAM: Exam = {
-  id: 'r02-october-pm',
-  title: '令和2年度 10月 午後',
+  id: 'r02-autumn-pm',
+  title: '令和2年度 秋期 午後',
   order: 2020.2,
   credit: '出典: 令和2年度 10月 応用情報技術者試験 午後 (©2020 独立行政法人情報処理推進機構)',
 };

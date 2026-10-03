@@ -1,8 +1,8 @@
 import { CHOICE_LABELS, type Exam, type Field, type Question } from '../types';
 
 export const EXAM: Exam = {
-  id: 'r02-october-am',
-  title: '令和2年度 10月 午前',
+  id: 'r02-autumn-am',
+  title: '令和2年度 秋期 午前',
   order: 2020.2,
   credit: '出典: 令和2年度 10月 応用情報技術者試験 午前 (©2020 独立行政法人情報処理推進機構)',
   authoredExplanation: true,
