@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { EXAMS, PM_EXAMS, QUESTIONS, WRITTEN_QUESTIONS } from '.';
 import { CHOICE_LABELS } from './types';
+import * as r03AutumnAm from './exams/r03-autumn-am';
 import * as r04AutumnAm from './exams/r04-autumn-am';
 import * as r05AutumnAm from './exams/r05-autumn-am';
 import * as r06AutumnAm from './exams/r06-autumn-am';
@@ -42,6 +43,7 @@ describe('exam data', () => {
     [r06AutumnAm, 'ウエウアウイウウウイウエエイアウアエウウウウウウイエイウイイイウウウエアウウアウウイエイイアウイイエウエアエエウイアアウイエイイウアエウウウウアイウイイアイアウ'],
     [r05AutumnAm, 'ウエアアウウイウウアイイイエエエアイエエウウアアイエアアイアウイイイエウアウアアイウアアエウエアアアエウアエアイイウウイイアエウアエアウイウエイイエエイエエアイ'],
     [r04AutumnAm, 'イエアイイエエイイエイウウエアイウウウウウエウアエイイウウイウアウエエウアウアイイイアイイアイイエウウイエウイウイエウアエイウイエエエウイエウイウイエウイウエア'],
+    [r03AutumnAm, 'エエウアウイウエエイアイエアエアアウアアアアイエウエイイイエアアエイエイイウアウアアアイエイアウアイエイイエウイエウイウアウアイイエアイエアエイアウアウアアエア'],
   ])('$EXAM.id answers match the official answer key', (mod, key) => {
     expect(mod.QUESTIONS.map((q) => CHOICE_LABELS[q.answer]).join('')).toBe(key);
   });

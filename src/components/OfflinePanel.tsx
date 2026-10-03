@@ -6,7 +6,7 @@ import { percent } from '../lib/quiz';
 import { ProgressBar } from './ui';
 
 /** 午後の問題冊子(全ページ)の合計サイズの目安 */
-const PM_TOTAL_MB = 21;
+const PM_TOTAL_MB = 26;
 
 /** オフライン用のダウンロードと、ホーム画面への追加の案内 */
 export default function OfflinePanel() {
