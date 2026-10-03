@@ -4,6 +4,7 @@ import { QUESTIONS, WRITTEN_QUESTIONS, questionLabel } from '../data';
 import { FIELD_LABELS, type Field } from '../data/types';
 import { percent } from '../lib/quiz';
 import { amStatus, pmItemKey } from '../lib/userData';
+import { useSync } from '../store/SyncContext';
 import { useUserData } from '../store/UserDataContext';
 
 interface Row {
@@ -28,6 +29,7 @@ function Bar({ value }: { value: number }) {
 /** 学習記録: 分野別の正答率と苦手な問題 */
 export default function StatsPage() {
   const { data, reset } = useUserData();
+  const { account } = useSync();
 
   // 午前: 中分類ごと
   const amRows = new Map<string, Row>();
@@ -81,7 +83,9 @@ export default function StatsPage() {
   })).filter((x) => x.items.length > 0);
 
   const confirmReset = () => {
-    if (window.confirm('学習記録・ブックマーク・メモをすべて削除します。よろしいですか？')) reset();
+    if (window.confirm(account
+          ? '学習記録・ブックマーク・メモをこの端末から削除します。ログイン中のため、次の同期でサーバの記録が戻ります。よろしいですか？'
+          : '学習記録・ブックマーク・メモをすべて削除します。よろしいですか？')) reset();
   };
 
   const renderTable = (rows: Row[], unit: string) => (
@@ -163,7 +167,10 @@ export default function StatsPage() {
         </ul>
       )}
 
-      <p className="hint">記録は現在このブラウザ内に保存されています。</p>
+      <p className="hint">
+        {account ? 'ログイン中のため、記録は端末間で同期されています。' : '記録はこのブラウザ内に保存されています。'}
+        <Link to="/account">{account ? 'アカウント' : 'ログインして端末間で同期する'}</Link>
+      </p>
       <div className="actions">
         <span />
         <button className="danger" onClick={confirmReset}>

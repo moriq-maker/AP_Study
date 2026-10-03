@@ -1,0 +1,145 @@
+import { useState } from 'react';
+import { useSync, type SyncStatus } from '../store/SyncContext';
+
+const STATUS_TEXT: Record<SyncStatus, string> = {
+  checking: 'ログイン状態を確認中…',
+  'signed-out': '未ログイン',
+  syncing: '同期中…',
+  synced: '同期済み',
+  error: '同期エラー',
+};
+
+function errorText(e: unknown): string {
+  const msg = e && typeof e === 'object' && 'message' in e ? String((e as { message: unknown }).message) : String(e);
+  if (/rate limit/i.test(msg)) return '短時間に何度も送信したため制限されています。しばらく待ってから再度お試しください。';
+  if (/expired|invalid/i.test(msg)) return 'コードが正しくないか、有効期限が切れています。もう一度コードを送信してください。';
+  if (/fetch|network/i.test(msg)) return 'サーバに接続できませんでした。通信環境を確認してください。';
+  return msg;
+}
+
+/** ログインと端末間同期 */
+export default function AccountPage() {
+  const sync = useSync();
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
+  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await fn();
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (sync.account) {
+    return (
+      <div className="card">
+        <h1>アカウント</h1>
+        <p>
+          <strong>{sync.account.email}</strong> でログイン中
+        </p>
+        <p className={`sync-status sync-${sync.status}`}>
+          {STATUS_TEXT[sync.status]}
+          {sync.lastSyncedAt && sync.status === 'synced' && `(${sync.lastSyncedAt.toLocaleTimeString()})`}
+        </p>
+        {sync.error && <p className="error">エラー: {errorText(sync.error)}</p>}
+        <p className="hint">
+          解答履歴・ブックマーク・メモは自動で同期されます。別の端末で同じメールアドレスでログインすると、記録が統合されます。
+        </p>
+        <div className="actions">
+          <button className="link" onClick={() => void run(sync.syncNow)} disabled={busy}>
+            今すぐ同期
+          </button>
+          <button
+            className="danger"
+            disabled={busy}
+            onClick={() => {
+              if (window.confirm('ログアウトします。この端末の学習データは消えますが、サーバには残ります。よろしいですか？')) {
+                void run(sync.signOut);
+              }
+            }}
+          >
+            ログアウト
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card">
+      <h1>ログイン</h1>
+      <p className="hint">
+        ログインすると、学習記録・ブックマーク・メモが端末間で同期されます。ログインしなくても、この端末の中で記録は保存されます。
+      </p>
+      {sync.status === 'checking' ? (
+        <p className="hint">{STATUS_TEXT.checking}</p>
+      ) : step === 'email' ? (
+        <form
+          className="login-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void run(async () => {
+              await sync.sendCode(email.trim());
+              setStep('code');
+            });
+          }}
+        >
+          <label htmlFor="email">メールアドレス</label>
+          <input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <button className="primary" type="submit" disabled={busy || !email.trim()}>
+            {busy ? '送信中…' : 'ログインコードを送る'}
+          </button>
+          <p className="hint">初めての場合はアカウントが作成されます。パスワードは不要です。</p>
+        </form>
+      ) : (
+        <form
+          className="login-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void run(() => sync.verifyCode(email.trim(), code));
+          }}
+        >
+          <p>
+            <strong>{email}</strong> にメールを送りました。メールに書かれた 6 桁のコードを入力するか、メール内のリンクを開いてください。
+          </p>
+          <label htmlFor="code">ログインコード</label>
+          <input
+            id="code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]*"
+            maxLength={10}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+          <button className="primary" type="submit" disabled={busy || code.trim().length < 6}>
+            {busy ? '確認中…' : 'ログイン'}
+          </button>
+          <button
+            type="button"
+            className="link"
+            onClick={() => {
+              setStep('email');
+              setCode('');
+            }}
+          >
+            メールアドレスを変更 / 再送する
+          </button>
+        </form>
+      )}
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}

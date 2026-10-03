@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { HashRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router';
+import AccountPage from './pages/AccountPage';
 import { BookmarksPage, CategoryPage, ExamPage, ExamsPage, FieldsPage } from './pages/ArchivePages';
 import AmQuestionPage from './pages/AmQuestionPage';
 import HomePage from './pages/HomePage';
@@ -8,6 +9,7 @@ import PmQuestionPage from './pages/PmQuestionPage';
 import PracticePage from './pages/PracticePage';
 import SearchPage from './pages/SearchPage';
 import StatsPage from './pages/StatsPage';
+import { SyncProvider, useSync } from './store/SyncContext';
 import { UserDataProvider } from './store/UserDataContext';
 
 const NAV_ITEMS = [
@@ -28,6 +30,23 @@ function ScrollToTop() {
   return null;
 }
 
+/** ヘッダーのアカウント表示(ログイン状態と同期状態) */
+function AccountLink() {
+  const { account, status } = useSync();
+  return (
+    <NavLink to="/account" className={({ isActive }) => `nav-link account-link ${isActive ? 'nav-active' : ''}`}>
+      {account ? (
+        <>
+          <span className={`sync-dot sync-${status}`} aria-hidden="true" />
+          {status === 'error' ? '同期エラー' : 'アカウント'}
+        </>
+      ) : (
+        'ログイン'
+      )}
+    </NavLink>
+  );
+}
+
 function Layout() {
   return (
     <div className="app">
@@ -43,6 +62,7 @@ function Layout() {
               {item.label}
             </NavLink>
           ))}
+          <AccountLink />
         </nav>
       </header>
       <main>
@@ -58,6 +78,7 @@ function Layout() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/bookmarks" element={<BookmarksPage />} />
           <Route path="/stats" element={<StatsPage />} />
+          <Route path="/account" element={<AccountPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
@@ -70,7 +91,9 @@ export default function App() {
   return (
     <HashRouter>
       <UserDataProvider>
-        <Layout />
+        <SyncProvider>
+          <Layout />
+        </SyncProvider>
       </UserDataProvider>
     </HashRouter>
   );

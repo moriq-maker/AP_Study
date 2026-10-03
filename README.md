@@ -16,7 +16,17 @@
 | ブックマーク | `#/bookmarks` | ブックマークした問題とメモのある問題 |
 | 記録 | `#/stats` | 分野別の正答率、間違えた問題・解答欄の一覧 |
 
-学習記録(解答履歴・ブックマーク・メモ)は現在ブラウザの localStorage に保存しています。端末間同期に備えて、各記録に更新時刻を持たせ、レコード単位でマージできる形にしています(`src/lib/userData.ts`)。
+| アカウント | `#/account` | メールのログインコードでログインし、学習記録を端末間で同期 |
+
+学習記録(解答履歴・ブックマーク・メモ)はブラウザの localStorage に保存し、ログイン中は Supabase と自動で同期します。各記録に更新時刻を持たせ、レコード単位で新しい方を採用してマージするので、複数端末で別々に解いた記録も失われません(`src/lib/userData.ts`, `src/lib/sync.ts`)。
+
+## Supabase の設定(端末間同期)
+
+接続先は `src/lib/supabase.ts` に書いてある(別のプロジェクトを使うときは `.env.local` に `VITE_SUPABASE_URL` / `VITE_SUPABASE_KEY` を設定)。プロジェクト側では次を一度だけ行う。
+
+1. **SQL Editor** で `supabase/schema.sql` を実行する(テーブル作成と行レベルセキュリティ)
+2. **Authentication → Email Templates** の「Magic Link」と「Confirm signup」の本文に、ログインコード `{{ .Token }}` を入れる
+3. **Authentication → URL Configuration** の Site URL / Redirect URLs に公開先の URL を登録する(メール内のリンクでログインする場合に必要)
 
 ## 収録問題
 

@@ -2,9 +2,11 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import {
   emptyUserData,
   loadUserData,
+  mergeUserData,
   pmItemKey,
   recordAm,
   recordPmItem,
+  sameUserData,
   saveUserData,
   setNote,
   toggleBookmark,
@@ -19,6 +21,8 @@ interface UserDataApi {
   toggleBookmark: (id: string) => void;
   setNote: (id: string, text: string) => void;
   reset: () => void;
+  /** 他の端末(サーバ)のデータを取り込む。内容が変わらなければ何もしない */
+  mergeFrom: (other: UserData) => void;
 }
 
 const UserDataContext = createContext<UserDataApi | null>(null);
@@ -39,6 +43,11 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
       toggleBookmark: (id) => setData((d) => toggleBookmark(d, id)),
       setNote: (id, text) => setData((d) => setNote(d, id, text)),
       reset: () => setData(emptyUserData()),
+      mergeFrom: (other) =>
+        setData((d) => {
+          const merged = mergeUserData(d, other);
+          return sameUserData(merged, d) ? d : merged;
+        }),
     }),
     [data],
   );

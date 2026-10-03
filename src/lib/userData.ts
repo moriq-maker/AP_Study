@@ -176,3 +176,21 @@ export function saveUserData(data: UserData): void {
     // 保存できなくても学習自体は継続できる
   }
 }
+
+/** キーの順序に依存しない JSON 文字列。内容が同じかどうかの比較に使う */
+export function canonicalJson(value: unknown): string {
+  return JSON.stringify(value, (_key, v: unknown) =>
+    v && typeof v === 'object' && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)))
+      : v,
+  );
+}
+
+export function sameUserData(a: UserData, b: UserData): boolean {
+  return canonicalJson(a) === canonicalJson(b);
+}
+
+/** サーバから取得したデータを安全に UserData として扱う(壊れていれば空とみなす) */
+export function toUserData(value: unknown): UserData {
+  return isUserData(value) ? { ...emptyUserData(), ...value } : emptyUserData();
+}
