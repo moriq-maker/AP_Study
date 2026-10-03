@@ -64,7 +64,7 @@ function PmQuestionView({ id }: { id: string }) {
             <>
               {question.referencePages && (
                 <details className="reference">
-                  <summary>共通の記述形式(参考ページ)</summary>
+                  <summary>{question.referenceLabel ?? '共通の記述形式(参考ページ)'}</summary>
                   {question.referencePages.map((src) => (
                     <img key={src} className="q-page" src={assetUrl(src)} alt="参考ページ" loading="lazy" />
                   ))}

@@ -84,6 +84,8 @@ export interface WrittenQuestion {
   pages: string[];
   /** 問題を読むのに必要な共通ページ(擬似言語の記述形式など) */
   referencePages?: string[];
+  /** referencePages の見出し。省略時は「共通の記述形式(参考ページ)」 */
+  referenceLabel?: string;
   /** 出題趣旨(公式) */
   aim: string;
   items: WrittenItem[];
