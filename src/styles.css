@@ -235,33 +235,30 @@ kbd {
   text-decoration: none;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  background: linear-gradient(135deg, var(--hero-from), var(--hero-to));
-  color: #fff;
-  font-weight: 800;
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
-  box-shadow: 0 4px 12px rgb(91 91 214 / 0.35);
-  flex: none;
+.brand picture {
+  display: contents;
 }
 
-.brand-text {
-  display: grid;
-  line-height: 1.2;
+.brand-logo {
+  display: block;
+  width: 168px;
+  height: auto;
 }
 
-.brand-text strong {
-  font-size: 1.02rem;
+.brand-mark-img {
+  display: block;
+  height: 34px;
+  width: auto;
 }
 
-.brand-text small {
-  font-size: 0.7rem;
-  color: var(--muted);
+.brand-wordmark {
+  display: block;
+  height: 22px;
+  width: auto;
+}
+
+.brand-compact {
+  gap: 2px;
 }
 
 .topbar {
@@ -422,7 +419,8 @@ kbd {
   }
 
   .sidebar .brand {
-    padding: 0 8px;
+    justify-content: center;
+    padding: 4px 8px 0;
   }
 
   .side-nav {

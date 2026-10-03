@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useSync } from '../store/SyncContext';
+import { assetUrl } from './QuestionBody';
 
 interface NavItem {
   to: string;
@@ -35,16 +36,28 @@ const NAV_ITEMS: NavItem[] = [
 
 const navClass = ({ isActive }: { isActive: boolean }) => (isActive ? 'active' : '');
 
-function Brand() {
+/** ライト/ダークで画像を切り替える */
+function ThemedImg({ light, dark, alt, className }: { light: string; dark?: string; alt: string; className: string }) {
   return (
-    <Link to="/" className="brand">
-      <span className="brand-mark" aria-hidden="true">
-        AP
-      </span>
-      <span className="brand-text">
-        <strong>AP Study</strong>
-        <small>応用情報 過去問演習</small>
-      </span>
+    <picture>
+      {dark && <source srcSet={assetUrl(dark)} media="(prefers-color-scheme: dark)" />}
+      <img className={className} src={assetUrl(light)} alt={alt} />
+    </picture>
+  );
+}
+
+/** ロゴ。PC のサイドバーは縦組みのロゴ、スマホの上部バーはマーク + 文字の横組み */
+function Brand({ variant }: { variant: 'full' | 'compact' }) {
+  return (
+    <Link to="/" className={`brand brand-${variant}`} aria-label="AP Study ホーム">
+      {variant === 'full' ? (
+        <ThemedImg className="brand-logo" light="brand/logo.webp" dark="brand/logo-dark.webp" alt="AP Study" />
+      ) : (
+        <>
+          <ThemedImg className="brand-mark-img" light="brand/mark.webp" alt="" />
+          <ThemedImg className="brand-wordmark" light="brand/wordmark.webp" dark="brand/wordmark-dark.webp" alt="AP Study" />
+        </>
+      )}
     </Link>
   );
 }
@@ -68,7 +81,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="shell">
       <aside className="sidebar" aria-label="メインメニュー">
-        <Brand />
+        <Brand variant="full" />
         <nav className="side-nav">
           {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} end={to === '/'} className={navClass}>
@@ -83,7 +96,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <header className="topbar">
-        <Brand />
+        <Brand variant="compact" />
         <div className="topbar-actions">
           <NavLink to="/search" className={navClass} aria-label="検索">
             <Search size={20} />
