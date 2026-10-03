@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   amStatus,
+  answeredToday,
+  studyStreak,
   emptyUserData,
   isBookmarked,
   mergeUserData,
@@ -69,5 +71,21 @@ describe('mergeUserData', () => {
     const on = toggleBookmark(emptyUserData(), 'q1', t(1));
     const off = toggleBookmark(on, 'q1', t(2));
     expect(isBookmarked(mergeUserData(on, off), 'q1')).toBe(false);
+  });
+});
+
+describe('studyStreak', () => {
+  const day = (d: number, h = 12) => new Date(2026, 4, d, h);
+  it('counts consecutive days ending today or yesterday', () => {
+    let d = emptyUserData();
+    d = recordAm(d, 'a', true, day(1));
+    d = recordAm(d, 'b', true, day(3));
+    d = recordAm(d, 'c', false, day(4));
+    d = recordPmItem(d, 'p#0', true, day(5));
+    expect(studyStreak(d, day(5, 20))).toBe(3);
+    // 今日まだ解いていなくても、昨日まで続いていれば途切れない
+    expect(studyStreak(d, day(6, 8))).toBe(3);
+    expect(studyStreak(d, day(7))).toBe(0);
+    expect(answeredToday(d, day(5, 20))).toBe(1);
   });
 });

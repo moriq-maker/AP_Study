@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Bookmark, NotebookPen } from 'lucide-react';
 import { isBookmarked } from '../lib/userData';
 import { useUserData } from '../store/UserDataContext';
 
@@ -14,7 +15,8 @@ export function BookmarkButton({ id }: { id: string }) {
       onClick={() => toggleBookmark(id)}
       title={on ? 'ブックマークを外す' : 'ブックマークする'}
     >
-      {on ? '★ ブックマーク中' : '☆ ブックマーク'}
+      <Bookmark size={16} fill={on ? 'currentColor' : 'none'} aria-hidden="true" />
+      {on ? 'ブックマーク中' : 'ブックマーク'}
     </button>
   );
 }
@@ -37,6 +39,7 @@ export function NoteEditor({ id }: { id: string }) {
   return (
     <div className="note">
       <label htmlFor={`note-${id}`} className="note-label">
+        <NotebookPen size={16} aria-hidden="true" />
         メモ
       </label>
       <textarea

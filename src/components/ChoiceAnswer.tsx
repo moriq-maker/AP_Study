@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { CircleCheck, CircleX } from 'lucide-react';
 import { getExam } from '../data';
 import { CHOICE_LABELS, type Question } from '../data/types';
 import QuestionBody from './QuestionBody';
@@ -57,6 +58,7 @@ export default function ChoiceAnswer({ question, selected, onChoose, onNext }: P
       {answered && (
         <div className={`feedback ${selected === question.answer ? 'feedback-ok' : 'feedback-ng'}`} role="status">
           <p className="feedback-title">
+            {selected === question.answer ? <CircleCheck size={20} aria-hidden="true" /> : <CircleX size={20} aria-hidden="true" />}
             {selected === question.answer ? '正解！' : `不正解 — 正解は「${CHOICE_LABELS[question.answer]}」`}
           </p>
           <p>{question.explanation}</p>

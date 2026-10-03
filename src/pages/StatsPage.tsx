@@ -1,9 +1,11 @@
 import { Link } from 'react-router';
+import { ChevronRight, CircleCheck, Flame, PenLine, RotateCcw, Trash2, Trophy } from 'lucide-react';
+import { PageHeader, ProgressBar, StatTile } from '../components/ui';
 import { AmQuestionList } from '../components/QuestionLists';
 import { QUESTIONS, WRITTEN_QUESTIONS, questionLabel } from '../data';
 import { FIELD_LABELS, type Field } from '../data/types';
 import { percent } from '../lib/quiz';
-import { amStatus, pmItemKey } from '../lib/userData';
+import { amStatus, pmItemKey, studyStreak } from '../lib/userData';
 import { useSync } from '../store/SyncContext';
 import { useUserData } from '../store/UserDataContext';
 
@@ -16,14 +18,6 @@ interface Row {
   attempts: number;
   correct: number;
   wrong: number;
-}
-
-function Bar({ value }: { value: number }) {
-  return (
-    <span className="bar" aria-hidden="true">
-      <span className="bar-fill" style={{ width: `${value}%` }} />
-    </span>
-  );
 }
 
 /** 学習記録: 分野別の正答率と苦手な問題 */
@@ -88,95 +82,115 @@ export default function StatsPage() {
           : '学習記録・ブックマーク・メモをすべて削除します。よろしいですか？')) reset();
   };
 
-  const renderTable = (rows: Row[], unit: string) => (
-    <table className="table stats-table">
-      <thead>
-        <tr>
-          <th>分野</th>
-          <th>解答済み</th>
-          <th>正答率</th>
-          <th>苦手</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r) => {
-          const rate = r.attempts === 0 ? null : percent(r.correct, r.attempts);
-          return (
-            <tr key={r.key}>
-              <td>
-                <Link to={`/fields/${encodeURIComponent(r.key)}`}>{r.label}</Link>
-                {r.sub && <span className="hint"> {r.sub}</span>}
-              </td>
-              <td>
-                {r.answered} / {r.total}
+  const renderRows = (rows: Row[], unit: string) => (
+    <ul className="panel score-rows stats-rows">
+      {rows.map((r) => {
+        const rate = r.attempts === 0 ? null : percent(r.correct, r.attempts);
+        return (
+          <li key={r.key}>
+            <Link to={`/fields/${encodeURIComponent(r.key)}`} className="stats-row">
+              <span className="category-name">
+                {r.label}
+                {r.sub && <small>{r.sub}</small>}
+              </span>
+              <ProgressBar value={rate ?? 0} tone={rate !== null && rate >= 60 ? 'ok' : 'primary'} />
+              <span className="score-num">{rate === null ? '—' : `${rate}%`}</span>
+              <span className="stats-detail">
+                {r.answered}/{r.total}
                 {unit}
-              </td>
-              <td>
-                {rate === null ? '—' : `${rate}%`} <Bar value={rate ?? 0} />
-              </td>
-              <td>{r.wrong}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+                {r.wrong > 0 && <em> ・ 苦手 {r.wrong}</em>}
+              </span>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 
+  const pmAll = [...pmRows.values()];
+  const pmAnswered = pmAll.reduce((n, r) => n + r.answered, 0);
+  const pmTotal = pmAll.reduce((n, r) => n + r.total, 0);
+  const streak = studyStreak(data);
+
   return (
-    <div className="card">
-      <h1>学習記録</h1>
-      <div className="score">
-        <span>
-          午前 解答済み {amAnswered} / {QUESTIONS.length} 問
-        </span>
-        <span>延べ正答率 {percent(amCorrect, amAttempts)}%</span>
-      </div>
+    <div className="page">
+      <PageHeader title="学習記録" subtitle="分野ごとの正答率と、間違えた問題を確認できます。" />
 
-      <h2>午前 分野別</h2>
-      {renderTable(amAll, '問')}
+      <section className="stat-grid">
+        <StatTile icon={Flame} label="連続学習" value={streak} unit="日" tone="warn" />
+        <StatTile icon={CircleCheck} label="午前 解答済み" value={amAnswered} unit={`/ ${QUESTIONS.length}`} tone="ok" />
+        <StatTile icon={Trophy} label="午前 延べ正答率" value={amAttempts ? percent(amCorrect, amAttempts) : '—'} unit={amAttempts ? '%' : ''} />
+        <StatTile icon={PenLine} label="午後 解答した欄" value={pmAnswered} unit={`/ ${pmTotal}`} />
+      </section>
 
-      <h2>午前 間違えた問題({wrongQuestions.length})</h2>
-      {wrongQuestions.length > 0 && (
-        <div className="actions">
-          <Link className="button primary" to="/practice?mode=weak&count=20">
-            間違えた問題を演習する
-          </Link>
+      <section className="section">
+        <div className="section-head">
+          <h2>午前 分野別</h2>
         </div>
-      )}
-      <AmQuestionList questions={wrongQuestions} data={data} source="wrong" showExam />
+        {renderRows(amAll, '問')}
+      </section>
 
-      <h2>午後 分野別(解答欄単位)</h2>
-      {renderTable([...pmRows.values()], '欄')}
+      <section className="section">
+        <div className="section-head">
+          <h2>午前 間違えた問題({wrongQuestions.length})</h2>
+          {wrongQuestions.length > 0 && (
+            <Link className="btn btn-primary btn-sm" to="/practice?mode=weak&count=20">
+              <RotateCcw size={16} aria-hidden="true" />
+              まとめて復習
+            </Link>
+          )}
+        </div>
+        <div className="panel panel-flush">
+          <AmQuestionList questions={wrongQuestions} data={data} source="wrong" showExam />
+        </div>
+      </section>
 
-      <h2>午後 間違えた解答欄</h2>
-      {pmWrong.length === 0 ? (
-        <p className="hint">該当する解答欄はありません。</p>
-      ) : (
-        <ul className="library">
-          {pmWrong.map(({ q, items }) => (
-            <li key={q.id}>
-              <Link className="library-row" to={`/pm/${q.id}`}>
-                <span className="library-meta">
-                  <span>{questionLabel(q)}</span>
-                  <span className="tag">{q.category}</span>
-                </span>
-                <span className="library-title">{items.map((it) => it.label).join('、')}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <section className="section">
+        <div className="section-head">
+          <h2>午後 分野別(解答欄単位)</h2>
+        </div>
+        {renderRows(pmAll, '欄')}
+      </section>
 
-      <p className="hint">
-        {account ? 'ログイン中のため、記録は端末間で同期されています。' : '記録はこのブラウザ内に保存されています。'}
-        <Link to="/account">{account ? 'アカウント' : 'ログインして端末間で同期する'}</Link>
-      </p>
-      <div className="actions">
-        <span />
-        <button className="danger" onClick={confirmReset}>
+      <section className="section">
+        <div className="section-head">
+          <h2>午後 間違えた解答欄</h2>
+        </div>
+        <div className="panel panel-flush">
+          {pmWrong.length === 0 ? (
+            <p className="empty">該当する解答欄はありません。</p>
+          ) : (
+            <ul className="library">
+              {pmWrong.map(({ q, items }) => (
+                <li key={q.id}>
+                  <Link className="library-row row-wrong" to={`/pm/${q.id}`}>
+                    <span className="library-num">{q.number}</span>
+                    <span className="library-body">
+                      <span className="library-meta">
+                        <span>{questionLabel(q)}</span>
+                        <span className="tag">{q.category}</span>
+                      </span>
+                      <span className="library-title">{items.map((it) => it.label).join('、')}</span>
+                    </span>
+                    <ChevronRight className="library-chevron" size={18} aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <section className="panel data-panel">
+        <p className="hint">
+          {account ? 'ログイン中のため、記録は端末間で同期されています。' : '記録はこのブラウザ内に保存されています。'}{' '}
+          <Link to="/account">{account ? 'アカウント' : 'ログインして端末間で同期する'}</Link>
+        </p>
+        <button className="btn btn-danger-ghost btn-sm" onClick={confirmReset}>
+          <Trash2 size={16} aria-hidden="true" />
           記録をリセット
         </button>
-      </div>
+      </section>
     </div>
   );
 }

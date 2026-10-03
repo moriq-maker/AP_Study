@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { Play } from 'lucide-react';
+import { PageHeader } from './ui';
 import { FIELD_LABELS, type Exam, type Field, type Question } from '../data/types';
 import { filterQuestions, type History, type QuizMode, type QuizOrder, type QuizSettings } from '../lib/quiz';
 
@@ -12,15 +14,16 @@ interface Props {
 }
 
 const ALL_FIELDS = Object.keys(FIELD_LABELS) as Field[];
+const FIELD_TONE = { technology: 'tech', management: 'mgmt', strategy: 'strat' } as const;
 const COUNT_OPTIONS = [5, 10, 20, 80];
 const MODE_LABELS: Record<QuizMode, string> = {
   random: 'すべての問題',
-  weak: '苦手な問題(前回不正解)',
-  unanswered: '未解答の問題',
+  weak: '苦手(前回不正解)',
+  unanswered: '未解答',
 };
 const ORDER_LABELS: Record<QuizOrder, string> = {
   shuffle: 'ランダム',
-  number: '問番号順(本番形式)',
+  number: '問番号順',
 };
 
 export default function PracticeSettings({ exams, questions, history, initial = {}, onStart }: Props) {
@@ -68,102 +71,112 @@ export default function PracticeSettings({ exams, questions, history, initial = 
   };
 
   return (
-    <div className="card">
-      <h1>演習</h1>
-      <p className="hint">条件を選んで午前問題を連続で解きます。</p>
+    <div className="page">
+      <PageHeader title="演習" subtitle="条件を選んで、午前問題を連続で解きます。" />
 
-      <section>
-        <h2>試験</h2>
-        <div className="chips chips-flat">
-          {exams.map((e) => (
-            <button
-              key={e.id}
-              type="button"
-              className={`chip ${examIds.includes(e.id) ? 'chip-on' : ''}`}
-              aria-pressed={examIds.includes(e.id)}
-              onClick={() => toggleExam(e.id)}
-            >
-              {e.title}({countByExam.get(e.id) ?? 0})
-            </button>
-          ))}
-        </div>
-        <p className="hint">試験を選ばない場合は、すべての試験から出題します。</p>
-      </section>
-
-      <section>
-        <h2>分野</h2>
-        {ALL_FIELDS.map((f) => (
-          <div key={f} className="field-group">
-            <label className="checkbox">
-              <input type="checkbox" checked={fields.includes(f)} onChange={() => toggleField(f)} />
-              <strong>{FIELD_LABELS[f]}</strong>
-            </label>
-            {fields.includes(f) && (
-              <div className="chips">
-                {(categoriesByField.get(f) ?? []).map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    className={`chip ${categories.includes(c) ? 'chip-on' : ''}`}
-                    aria-pressed={categories.includes(c)}
-                    onClick={() => toggleCategory(c)}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
-            )}
+      <div className="settings-grid">
+        <section className="panel settings-block">
+          <h2>試験</h2>
+          <div className="chips">
+            {exams.map((e) => (
+              <button
+                key={e.id}
+                type="button"
+                className={`chip ${examIds.includes(e.id) ? 'chip-on' : ''}`}
+                aria-pressed={examIds.includes(e.id)}
+                onClick={() => toggleExam(e.id)}
+              >
+                {e.title}
+                <span className="count">{countByExam.get(e.id) ?? 0}</span>
+              </button>
+            ))}
           </div>
-        ))}
-        <p className="hint">中分類を選ばない場合は、チェックした分野のすべてから出題します。</p>
-      </section>
+          <p className="hint">選ばない場合は、すべての試験から出題します。</p>
+        </section>
 
-      <section>
-        <h2>出題対象</h2>
-        <div className="radios">
-          {(Object.keys(MODE_LABELS) as QuizMode[]).map((m) => (
-            <label key={m} className="radio">
-              <input type="radio" name="mode" checked={mode === m} onChange={() => setMode(m)} />
-              {MODE_LABELS[m]}
-            </label>
+        <section className="panel settings-block">
+          <h2>分野</h2>
+          {ALL_FIELDS.map((f) => (
+            <div key={f} className={`field-group tone-${FIELD_TONE[f]}`}>
+              <label className="checkbox">
+                <input type="checkbox" checked={fields.includes(f)} onChange={() => toggleField(f)} />
+                <strong>{FIELD_LABELS[f]}</strong>
+              </label>
+              {fields.includes(f) && (
+                <div className="chips chips-indent">
+                  {(categoriesByField.get(f) ?? []).map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      className={`chip chip-sm ${categories.includes(c) ? 'chip-on' : ''}`}
+                      aria-pressed={categories.includes(c)}
+                      onClick={() => toggleCategory(c)}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
-        </div>
-      </section>
+          <p className="hint">中分類を選ばない場合は、チェックした分野のすべてから出題します。</p>
+        </section>
 
-      <section>
-        <h2>出題順</h2>
-        <div className="radios">
-          {(Object.keys(ORDER_LABELS) as QuizOrder[]).map((o) => (
-            <label key={o} className="radio">
-              <input type="radio" name="order" checked={order === o} onChange={() => setOrder(o)} />
-              {ORDER_LABELS[o]}
-            </label>
-          ))}
-        </div>
-      </section>
+        <section className="panel settings-block">
+          <h2>出題対象</h2>
+          <OptionGroup name="mode" label="出題対象" labels={MODE_LABELS} value={mode} onChange={setMode} />
+          <h2>出題順</h2>
+          <OptionGroup name="order" label="出題順" labels={ORDER_LABELS} value={order} onChange={setOrder} />
+          <h2>問題数</h2>
+          <OptionGroup
+            name="count"
+            label="問題数"
+            labels={Object.fromEntries(COUNT_OPTIONS.map((n) => [String(n), n === 80 ? '80問(本番)' : `${n}問`]))}
+            value={String(count)}
+            onChange={(v) => setCount(Number(v))}
+          />
+        </section>
+      </div>
 
-      <section>
-        <h2>問題数</h2>
-        <div className="radios">
-          {COUNT_OPTIONS.map((n) => (
-            <label key={n} className="radio">
-              <input type="radio" name="count" checked={count === n} onChange={() => setCount(n)} />
-              {n === 80 ? '80問(本番と同数)' : `${n}問`}
-            </label>
-          ))}
-        </div>
-      </section>
-
-      <div className="actions">
-        <span className="hint">対象: {available}問</span>
+      <div className="action-bar">
+        <span className="action-bar-info">
+          対象 <strong>{available}</strong> 問
+        </span>
         <button
-          className="primary"
+          className="btn btn-primary btn-grow"
           disabled={available === 0}
           onClick={() => onStart({ examIds, fields, categories: visibleCategories, count, mode, order })}
         >
+          <Play size={18} aria-hidden="true" />
           {available === 0 ? '対象の問題がありません' : `${Math.min(count, available)}問を開始`}
         </button>
       </div>
+    </div>
+  );
+}
+
+/** ラジオボタンをボタン風に並べた単一選択 */
+function OptionGroup<T extends string>({
+  name,
+  label,
+  labels,
+  value,
+  onChange,
+}: {
+  name: string;
+  label: string;
+  labels: Record<T, string>;
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="option-group" role="radiogroup" aria-label={label}>
+      {(Object.keys(labels) as T[]).map((k) => (
+        <label key={k} className={`option ${value === k ? 'option-on' : ''}`}>
+          <input type="radio" name={name} checked={value === k} onChange={() => onChange(k)} />
+          {labels[k]}
+        </label>
+      ))}
     </div>
   );
 }

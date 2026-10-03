@@ -194,3 +194,39 @@ export function sameUserData(a: UserData, b: UserData): boolean {
 export function toUserData(value: unknown): UserData {
   return isUserData(value) ? { ...emptyUserData(), ...value } : emptyUserData();
 }
+
+// ---- 学習の継続(ストリーク) ----
+
+/** 端末のタイムゾーンでの日付(YYYY-MM-DD) */
+export function localDay(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** 解答した日の集合 */
+export function activityDays(data: UserData): Set<string> {
+  const days = new Set<string>();
+  for (const s of [...Object.values(data.am), ...Object.values(data.pm)]) days.add(localDay(new Date(s.updatedAt)));
+  return days;
+}
+
+/** 今日(まだ解いていなければ昨日)まで何日連続で解いているか */
+export function studyStreak(data: UserData, now = new Date()): number {
+  const days = activityDays(data);
+  const cursor = new Date(now);
+  if (!days.has(localDay(cursor))) cursor.setDate(cursor.getDate() - 1);
+  let streak = 0;
+  while (days.has(localDay(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
+/** 今日解いた問題(午前)と解答欄(午後)の数 */
+export function answeredToday(data: UserData, now = new Date()): number {
+  const today = localDay(now);
+  return [...Object.values(data.am), ...Object.values(data.pm)].filter((s) => localDay(new Date(s.updatedAt)) === today).length;
+}
