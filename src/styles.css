@@ -2720,3 +2720,94 @@ button.danger:disabled {
 .sync-syncing.sync-status::before {
   background: var(--primary);
 }
+
+/* ---------- オフライン・更新の案内 ---------- */
+.toasts {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 76px);
+  transform: translateX(-50%);
+  z-index: 40;
+  display: grid;
+  gap: 8px;
+  width: min(560px, calc(100% - 24px));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 16px;
+  border-radius: 14px;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+  animation: pop-in 0.22s ease;
+}
+
+.toast > span {
+  flex: 1;
+}
+
+.toast .btn-ghost {
+  color: inherit;
+}
+
+.toast-muted {
+  background: var(--warn-soft);
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+}
+
+.toast-muted svg {
+  color: var(--warn);
+  flex: none;
+}
+
+@media (min-width: 960px) {
+  .toasts {
+    left: calc(50% + 124px);
+    bottom: 88px;
+  }
+}
+
+.offline-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.offline-progress {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.install-hint {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.install-hint svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* ホーム画面から全画面で起動したとき、ノッチやステータスバーに重ならないようにする */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .topbar {
+    height: calc(var(--topbar-h) + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+}

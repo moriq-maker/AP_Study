@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Cloud, CloudOff, LogOut, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
 import { PageHeader } from '../components/ui';
+import OfflinePanel from '../components/OfflinePanel';
 import { useSync, type SyncStatus } from '../store/SyncContext';
 
 const STATUS_TEXT: Record<SyncStatus, string> = {
@@ -8,6 +9,7 @@ const STATUS_TEXT: Record<SyncStatus, string> = {
   'signed-out': '未ログイン',
   syncing: '同期中…',
   synced: '同期済み',
+  offline: 'オフライン(つながったら自動で同期します)',
   error: '同期エラー',
 };
 
@@ -46,7 +48,7 @@ export default function AccountPage() {
         <PageHeader title="アカウント" />
         <section className="panel auth-card">
           <span className={`auth-icon sync-${sync.status}`}>
-            {sync.status === 'error' ? <CloudOff size={28} aria-hidden="true" /> : <Cloud size={28} aria-hidden="true" />}
+            {sync.status === 'error' || sync.status === 'offline' ? <CloudOff size={28} aria-hidden="true" /> : <Cloud size={28} aria-hidden="true" />}
           </span>
           <p className="auth-email">{sync.account.email}</p>
           <p className={`sync-status sync-${sync.status}`}>
@@ -76,6 +78,7 @@ export default function AccountPage() {
             </button>
           </div>
         </section>
+        <OfflinePanel />
       </div>
     );
   }
@@ -152,6 +155,7 @@ export default function AccountPage() {
           </p>
         )}
       </section>
+      <OfflinePanel />
     </div>
   );
 }

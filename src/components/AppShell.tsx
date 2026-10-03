@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, NavLink } from 'react-router';
 import {
   Bookmark,
@@ -9,10 +9,14 @@ import {
   Layers,
   Library,
   PenLine,
+  RefreshCw,
+  WifiOff,
   Search,
   UserRound,
   type LucideIcon,
 } from 'lucide-react';
+import { useRegisterSW } from 'virtual:pwa-register/react';
+import { useOnline } from '../lib/useOnline';
 import { useSync } from '../store/SyncContext';
 import { assetUrl } from './QuestionBody';
 
@@ -65,14 +69,53 @@ function Brand({ variant }: { variant: 'full' | 'compact' }) {
 /** ログイン・同期状態のバッジ */
 function AccountBadge({ compact = false }: { compact?: boolean }) {
   const { account, status } = useSync();
-  const label = !account ? 'ログイン' : status === 'error' ? '同期エラー' : status === 'syncing' ? '同期中' : '同期済み';
-  const Icon = !account ? UserRound : status === 'error' ? CloudOff : Cloud;
+  const label = !account ? 'ログイン' : status === 'error' ? '同期エラー' : status === 'offline' ? 'オフライン' : status === 'syncing' ? '同期中' : '同期済み';
+  const Icon = !account ? UserRound : status === 'error' || status === 'offline' ? CloudOff : Cloud;
   return (
     <NavLink to="/account" className={({ isActive }) => `account-badge ${isActive ? 'active' : ''} sync-${account ? status : 'none'}`}>
       <Icon size={18} aria-hidden="true" />
       {!compact && <span>{account ? account.email : label}</span>}
       {compact && <span className="sr-only">{label}</span>}
     </NavLink>
+  );
+}
+
+/** 圏外のときの帯と、新しいバージョンが届いたときの更新案内 */
+function StatusToasts() {
+  const online = useOnline();
+  // 圏外になったときに数秒だけ知らせる
+  const [showOffline, setShowOffline] = useState(false);
+  useEffect(() => {
+    setShowOffline(!online);
+    if (online) return;
+    const timer = setTimeout(() => setShowOffline(false), 6000);
+    return () => clearTimeout(timer);
+  }, [online]);
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW();
+  return (
+    <div className="toasts" aria-live="polite">
+      {showOffline && (
+        <div className="toast toast-muted">
+          <WifiOff size={16} aria-hidden="true" />
+          <span>オフラインです。解いた記録は端末に保存され、つながったら同期されます。</span>
+        </div>
+      )}
+      {needRefresh && (
+        <div className="toast">
+          <RefreshCw size={16} aria-hidden="true" />
+          <span>新しいバージョンがあります</span>
+          <button className="btn btn-primary btn-sm" onClick={() => void updateServiceWorker(true)}>
+            更新
+          </button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setNeedRefresh(false)}>
+            あとで
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -109,6 +152,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <main className="content">{children}</main>
+      <StatusToasts />
 
       <nav className="tabbar" aria-label="メインメニュー">
         {NAV_ITEMS.filter((item) => item.tab).map(({ to, label, icon: Icon }) => (

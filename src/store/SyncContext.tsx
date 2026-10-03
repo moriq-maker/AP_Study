@@ -5,7 +5,7 @@ import { syncOnce } from '../lib/sync';
 import { canonicalJson } from '../lib/userData';
 import { useUserData } from './UserDataContext';
 
-export type SyncStatus = 'checking' | 'signed-out' | 'syncing' | 'synced' | 'error';
+export type SyncStatus = 'checking' | 'signed-out' | 'syncing' | 'synced' | 'offline' | 'error';
 
 interface Account {
   userId: string;
@@ -63,6 +63,11 @@ export function SyncProvider({ children }: { children: ReactNode }) {
   const runSync = useCallback(async (): Promise<void> => {
     const client = clientRef.current;
     if (!client || !account) return;
+    // 圏外では送らずに待つ(手元の記録は保存済みで、つながったら同期する)
+    if (!navigator.onLine) {
+      setStatus('offline');
+      return;
+    }
     // 同期中に呼ばれたら、終わってからもう一度だけ実行する
     if (inFlightRef.current) {
       pendingRef.current = true;
@@ -138,8 +143,16 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     const onVisible = () => {
       if (document.visibilityState === 'visible') void runSync();
     };
+    const onOnline = () => void runSync();
+    const onOffline = () => setStatus('offline');
     document.addEventListener('visibilitychange', onVisible);
-    return () => document.removeEventListener('visibilitychange', onVisible);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
   }, [account, runSync]);
 
   const api = useMemo<SyncApi>(
