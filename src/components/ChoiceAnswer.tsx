@@ -16,7 +16,9 @@ interface Props {
 /** 入力欄にフォーカスがあるときはキーボードショートカットを無効にする */
 function isTyping(e: KeyboardEvent): boolean {
   const el = e.target as HTMLElement | null;
-  return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+  if (!el) return false;
+  // 電卓の操作中は解答のショートカットを使わない
+  return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable || !!el.closest('[data-calculator]');
 }
 
 /** 午前問題(4 択)の問題文・選択肢・正誤と解説 */

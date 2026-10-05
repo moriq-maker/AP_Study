@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink, useLocation } from 'react-router';
 import {
   Bookmark,
   ChartColumn,
@@ -18,6 +18,7 @@ import {
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useOnline } from '../lib/useOnline';
 import { useSync } from '../store/SyncContext';
+import Calculator from './Calculator';
 import { assetUrl } from './QuestionBody';
 
 interface NavItem {
@@ -120,7 +121,11 @@ function StatusToasts() {
 }
 
 /** PC はサイドバー、スマホは上部バー + 下部タブのレイアウト */
+/** 電卓を出す画面(問題を解く画面) */
+const CALCULATOR_PATHS = /^\/(q|pm|practice)(\/|$)/;
+
 export default function AppShell({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
   return (
     <div className="shell">
       <aside className="sidebar" aria-label="メインメニュー">
@@ -153,6 +158,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
       <main className="content">{children}</main>
       <StatusToasts />
+      {CALCULATOR_PATHS.test(pathname) && <Calculator />}
 
       <nav className="tabbar" aria-label="メインメニュー">
         {NAV_ITEMS.filter((item) => item.tab).map(({ to, label, icon: Icon }) => (
